@@ -54,7 +54,6 @@ namespace NetsisRestOrnekleri
 
         public static string GetirToken()
         {
-            var token = "";
             var url = "http://netsisrestserver:7070/api/v2/token";
             var restClient = new RestClient(url);
             var request = new RestRequest
@@ -68,8 +67,9 @@ namespace NetsisRestOrnekleri
             request.AddBody(body);
 
             var httpResult = restClient.Execute<TokenSonuc>(request);
+            var token = httpResult.IsSuccessful && string.IsNullOrEmpty(httpResult.Data.error) ? httpResult.Data.access_token : "";
 
-            return httpResult.Data.access_token;
+            return token;
         }
 
     }

@@ -21,5 +21,9 @@ namespace NetsisRestOrnekleri.Model
 
         [JsonProperty(".expires")]
         public string Expires { get; set; }
+
+        public string error { get; set; }
+        public string error_description { get; set; }
+
     }
 }
