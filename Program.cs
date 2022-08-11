@@ -1,5 +1,6 @@
 ﻿using NetsisRestOrnekleri.Model;
 using RestSharp;
+using RestSharp.Authenticators.OAuth2;
 using System;
 using System.Collections.Generic;
 
@@ -9,7 +10,7 @@ namespace NetsisRestOrnekleri
     {
         static void Main(string[] args)
         {
-            var url = "http://restapiurl";
+            var url = "http://netsisrestserver:7070/api/v2/ItemSlips";
             var restClient = new RestClient(url);
 
             var siparis = new Dokuman();
@@ -43,10 +44,33 @@ namespace NetsisRestOrnekleri
                 RequestFormat = DataFormat.Json,
             };
 
-            request.AddParameter("application/json", siparis, ParameterType.RequestBody);
+            restClient.Authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(GetirToken(), "Bearer");
+            request.AddHeader("Content-Type", "application/json");
+            request.AddBody(siparis);
 
             var httpResult = restClient.Execute(request);
 
         }
+
+        public static string GetirToken()
+        {
+            var token = "";
+            var url = "http://netsisrestserver:7070/api/v2/token";
+            var restClient = new RestClient(url);
+            var request = new RestRequest
+            {
+                Method = Method.Post,
+                RequestFormat = DataFormat.Json,
+            };
+
+            var body = "grant_type=password&branchcode=netsissubekodu&password=netsissifre&username=netsiskullanici&dbname=TEST&dbuser=TEMELSET&dbpassword=&dbtype=0";
+            request.AddHeader("Content-Type", "application/json");
+            request.AddBody(body);
+
+            var httpResult = restClient.Execute<TokenSonuc>(request);
+
+            return httpResult.Data.access_token;
+        }
+
     }
 }
